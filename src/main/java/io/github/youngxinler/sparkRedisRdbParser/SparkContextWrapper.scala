@@ -1,7 +1,7 @@
-package net.yxler.sparkRedisRdbParser
+package io.github.youngxinler.sparkRedisRdbParser
 
 import net.whitbeck.rdbparser.{KeyValuePair, ValueType}
-import net.yxler.sparkRedisRdbParser.KeyValuePairWrapper.WrapperCore
+import KeyValuePairWrapper.WrapperCore
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 

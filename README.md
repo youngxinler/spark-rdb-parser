@@ -2,8 +2,17 @@
 
 ## Overview
 spark read redis rdb file to a RDD, and select Redis Type to cast. 
- 
 
+to use this library, add dependency
+```java
+<dependency>
+    <groupId>io.github.youngxinler</groupId>
+    <artifactId>spark-redis-rdb-parser</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+## Example usage
 ```java
 import net.yxler.sparkRedisRdbParser.SparkContextWrapper.{RedisKeyValuePairWrapper, SparkContextRedisRdbFileWrapper}
 
@@ -35,4 +44,11 @@ val list: RDD[(String, List[String])] = spark.sparkContext.redisRdbFile(path).se
 val zset: RDD[(String, Set[String, Double])] = spark.sparkContext.redisRdbFile(path).selectZSet()
 ```
 
+## QA
+If you have any questions, please submit issue.
 
+If you pay attention to improvement, you are also welcome to pull request.
+
+
+## References
+inner core parser use java-rdb-parser. https://github.com/jwhitbeck/java-rdb-parser

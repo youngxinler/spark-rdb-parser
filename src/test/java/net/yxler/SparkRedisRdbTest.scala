@@ -1,6 +1,6 @@
 package net.yxler
 
-import net.yxler.sparkRedisRdbParser.SparkContextWrapper.{RedisKeyValuePairWrapper, SparkContextRedisRdbFileWrapper}
+import io.github.youngxinler.sparkRedisRdbParser.SparkContextWrapper.{RedisKeyValuePairWrapper, SparkContextRedisRdbFileWrapper}
 import org.apache.spark.{SparkConf, sql}
 
 import java.nio.file.Files

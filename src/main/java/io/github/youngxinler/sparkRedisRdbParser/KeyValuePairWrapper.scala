@@ -1,4 +1,4 @@
-package net.yxler.sparkRedisRdbParser
+package io.github.youngxinler.sparkRedisRdbParser
 
 import net.whitbeck.rdbparser.{KeyValuePair, RdbParser, ValueType}
 
