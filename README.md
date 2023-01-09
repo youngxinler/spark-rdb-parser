@@ -12,6 +12,8 @@ val conf = new SparkConf().set("spark.master", "local[*]")
     .registerKryoClasses(Array(Class.forName("net.whitbeck.rdbparser.KeyValuePair")));
 val spark = new sql.SparkSession.Builder().config(conf).appName(this.getClass.getSimpleName.stripSuffix("$")).getOrCreate()
 
+val path = "your rdb file path"
+
 // Get All RDB Key Value
 val rdd: RDD[KeyValuePair] = spark.sparkContext.redisRdbFile(path)
 
