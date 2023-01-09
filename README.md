@@ -1,4 +1,4 @@
-# Spark Read RDB File Parser Util
+# Spark Read RDB File Parser
 
 ## Overview
 spark read redis rdb file to a RDD, and select Redis Type to cast. 
