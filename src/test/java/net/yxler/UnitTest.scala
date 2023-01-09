@@ -1,18 +1,18 @@
 package net.yxler
 
+
 import net.yxler.sparkRedisRdbParser.SparkContextWrapper.{RedisKeyValuePairWrapper, SparkContextRedisRdbFileWrapper}
 import org.apache.spark.{SparkConf, sql}
+import org.scalatest.{FunSuite, Matchers}
 
-import java.nio.file.Files
 
-object SparkRedisRdbTest {
-  def main(args: Array[String]): Unit = {
+
+class UnitTest extends FunSuite with Matchers{
+  test("sparkTest") {
     val conf = new SparkConf().set("spark.master", "local[*]")
       .registerKryoClasses(Array(Class.forName("net.whitbeck.rdbparser.KeyValuePair")));
     val spark = new sql.SparkSession.Builder().config(conf).appName(this.getClass.getSimpleName.stripSuffix("$")).getOrCreate()
-    val resourcePath = "redis<=6.2.8-test.rdb"
-
-    val path = this.getClass.getClassLoader.getResource(resourcePath).toURI.getPath
+    val path = "file:///Users/yxler/code/redis<=6.2.8-test.rdb"
 
     val kv = spark.sparkContext.redisRdbFile(path).selectKV().collect()
     val hash = spark.sparkContext.redisRdbFile(path).selectHash().collect()
@@ -25,7 +25,7 @@ object SparkRedisRdbTest {
     assert(kv(0)._1 == "hello1" && kv(0)._2 == "world1")
 
     assert(hash.length == 1)
-    assert(hash(0)._1 == "hash1" && hash(0)._2("f1") == "v1" && hash(0)._2("f2") == "v2")
+    assert(hash(0)._1 == "hash1" && hash(0)._2 == Map("f1" -> "v1", "f2" -> "v2"))
 
 
     assert(set.length == 1)
@@ -38,5 +38,4 @@ object SparkRedisRdbTest {
     val assertZSetRes = Set(("v1", 1.0D), ("v2", 2.0D))
     assert(zset(0)._1 == "zset1" && zset(0)._2 == assertZSetRes)
   }
-
 }

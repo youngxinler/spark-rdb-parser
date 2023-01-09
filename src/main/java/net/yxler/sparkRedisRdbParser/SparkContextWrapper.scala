@@ -1,21 +1,18 @@
 package net.yxler.sparkRedisRdbParser
 
 import net.whitbeck.rdbparser.{KeyValuePair, ValueType}
+import net.yxler.sparkRedisRdbParser.KeyValuePairWrapper.WrapperCore
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 import java.util.regex.Pattern
-import java.util.stream.Collectors
 import scala.language.postfixOps
 import scala.reflect.ClassTag
-import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 object SparkContextWrapper {
   implicit class SparkContextRedisRdbFileWrapper(val sc: SparkContext) {
-
     def redisRdbFile(path: String,  keyRegexMatch: String = null, typeFilter: List[ValueType] = List.empty): RDD[KeyValuePair] = {
-      val allRdb = sc.newAPIHadoopFile("file:///Users/yxler/data/redis-rdb/test.rdb", classOf[RedisRdbNewInputFormat], classOf[String], classOf[KeyValuePair], sc.hadoopConfiguration)
+      val allRdb = sc.newAPIHadoopFile(path, classOf[RedisRdbNewInputFormat], classOf[String], classOf[KeyValuePair], sc.hadoopConfiguration)
 
       val filters = (key: String, pair: KeyValuePair) => {
         var isFilter = true
@@ -37,48 +34,51 @@ object SparkContextWrapper {
 
 
   implicit class RedisKeyValuePairWrapper[T <: KeyValuePair: ClassTag](val rdd: RDD[T]) {
-
-
     def selectKV(): RDD[(String, String)] = {
-      rdd.map(kv => {
+      rdd.flatMap(kv => {
         if (kv.getValueType == ValueType.VALUE)
-          (new String(kv.getKey), new String(kv.getValues.get(0)))
+          Option.apply(kv.asKV())
         else
-          null
+          Option.empty[(String, String)]
       })
     }
 
     def selectList(): RDD[(String, List[String])] = {
-      rdd.map(kv => {
-        if (kv.getValueType == ValueType.LIST || kv.getValueType == ValueType.ZIPLIST) {
-          val key = new String(kv.getKey)
-          val list = kv.getValues.asScala.map(new String(_)).toList
-          (key, list)
+      rdd.flatMap(kv => {
+        if (kv.getValueType == ValueType.LIST || kv.getValueType == ValueType.ZIPLIST || kv.getValueType == ValueType.QUICKLIST) {
+          Option.apply(kv.asList())
         } else {
-          null
+          Option.empty[(String, List[String])]
         }
       })
     }
 
     def selectHash(): RDD[(String, Map[String, String])] = {
-      rdd.map(kv => {
-        if (kv.getValueType == ValueType.HASH || kv.getValueType == ValueType.HASHMAP_AS_ZIPLIST) {
-          val key = new String(kv.getKey)
-          var i = 0
-          val map = new mutable.HashMap[String, String]()
-          val bytesArray = kv.getValues
-          while (i < bytesArray.size()) {
-            map.put(new String(bytesArray.get(i++)), new String(bytesArray.get(i++)))
-          }
-        }
+      rdd.flatMap(kv => {
+        if (kv.getValueType == ValueType.HASH || kv.getValueType == ValueType.HASHMAP_AS_ZIPLIST)
+          Option.apply(kv.asHash())
+        else
+          Option.empty[(String, Map[String, String])]
       })
     }
 
-
     def selectSet(): RDD[(String, Set[String])] = {
-
+      rdd.flatMap(kv => {
+        if (kv.getValueType == ValueType.SET || kv.getValueType == ValueType.INTSET)
+          Option.apply(kv.asSet())
+        else
+          Option.empty[(String, Set[String])]
+      })
     }
 
-    select
+    def selectZSet(): RDD[(String, Set[(String, Double)])] = {
+      rdd.flatMap(kv => {
+        if (kv.getValueType == ValueType.SORTED_SET || kv.getValueType == ValueType.SORTED_SET2 || kv.getValueType == ValueType.SORTED_SET_AS_ZIPLIST)
+          Option.apply(kv.asZSet())
+        else {
+          Option.empty[(String, Set[(String, Double)])]
+        }
+      })
+    }
   }
 }

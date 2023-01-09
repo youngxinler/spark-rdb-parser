@@ -50,8 +50,6 @@ public class RedisRdbNewInputFormat extends FileInputFormat<String, KeyValuePair
                 if (entry.getType() == EntryType.KEY_VALUE_PAIR) {
                     KeyValuePair keyValuePair = (KeyValuePair) entry;
                     this.currentKey = new String(keyValuePair.getKey());
-                    // KeyValuePair 不能序列化
-//                    this.currentValue = null;
                     this.currentValue = keyValuePair;
                     return true;
                 }
