@@ -26,7 +26,7 @@ val hash: RDD[(String, Map[String, String])] = spark.sparkContext.redisRdbFile(p
 // Get All Redis Set Type
 val set: RDD[(String, Set[String])] = spark.sparkContext.redisRdbFile(path).selectSet()
 
-// Get All Redis List Tupe
+// Get All Redis List Type
 val list: RDD[(String, List[String])] = spark.sparkContext.redisRdbFile(path).selectList()
 
 // Get All Redis ZSet Type,  Double is the sorted set value's score
