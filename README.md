@@ -8,13 +8,14 @@ to use this library, add dependency
 <dependency>
     <groupId>io.github.youngxinler</groupId>
     <artifactId>spark-redis-rdb-parser</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 </dependency>
 ```
 
 ## Example usage
-```java
-import net.yxler.sparkRedisRdbParser.SparkContextWrapper.{RedisKeyValuePairWrapper, SparkContextRedisRdbFileWrapper}
+```scala
+import io.github.youngxinler.sparkRedisRdbParser.SparkContextWrapper.SparkContextRedisRdbFileWrapper;
+import io.github.youngxinler.sparkRedisRdbParser.SparkContextWrapper.RedisKeyValuePairWrapper;
 
 // must register Kyro Classs include "net.whitbeck.rdbparser.KeyValuePair"
 val conf = new SparkConf().set("spark.master", "local[*]")
@@ -31,7 +32,7 @@ val rdd: RDD[KeyValuePair] = spark.sparkContext.redisRdbFile(path)
 // Get All Redis String Type
 val kvRDD: RDD[(String, String)] = spark.sparkContext.redisRdbFile(path).selectKV()
 
-// Get All Redis Hash Type, map key is hash field, map value is the hash fied value 
+// Get All Redis Hash Type, map key is hash field, map value is the hash field value 
 val hash: RDD[(String, Map[String, String])] = spark.sparkContext.redisRdbFile(path).selectHash()
 
 // Get All Redis Set Type
